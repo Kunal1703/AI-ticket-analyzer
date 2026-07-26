@@ -33,3 +33,6 @@ coverage.xml
 
 # Docker
 *.log
+
+# Claude Code local files (skills, settings) — not part of the project
+.claude/

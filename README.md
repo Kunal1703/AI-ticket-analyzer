@@ -55,7 +55,7 @@ pip install -r requirements.txt
 Copy the example environment file and configure a provider:
 
 ```bash
-cp .env.example .env
+cp .env.example .env 
 ```
 
 Edit `.env` to select a provider and its credentials. For OpenAI:

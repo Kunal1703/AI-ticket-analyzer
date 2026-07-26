@@ -1,0 +1,58 @@
+name: Web CI
+
+# Quality gate for the Next.js frontend (web/), added in Milestone M4.2.
+# Kept separate from the Python `CI` workflow so the two toolchains stay
+# independent — a change to one never blocks the other.
+
+on:
+  push:
+    branches: ["main"]
+    paths: ["web/**", ".github/workflows/web-ci.yml"]
+  pull_request:
+    paths: ["web/**", ".github/workflows/web-ci.yml"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: web
+
+jobs:
+  quality:
+    name: Lint, type-check, test & build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type check
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build

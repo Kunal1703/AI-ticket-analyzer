@@ -1,0 +1,66 @@
+# ---------------------------------------------------------------------------
+# Docker build-context exclusions (Milestone M0.2).
+#
+# The Dockerfile uses `COPY . .`, so anything not excluded here is baked into
+# the image. We keep the context minimal: only the application package and the
+# runtime requirements are needed. Excluding the rest keeps the image small and
+# prevents secrets (.env) and the local virtualenv from leaking into the image.
+# ---------------------------------------------------------------------------
+
+# Virtual environments (huge; never belong in the image)
+venv/
+.venv/
+env/
+
+# Secrets — must never be copied into the image
+.env
+*.env
+!.env.example
+
+# Version control & CI
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# Python caches / build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+*.egg
+
+# Tests & dev tooling (not needed at runtime)
+tests/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+pyproject.toml
+requirements-dev.txt
+pytest.ini
+
+# Frontend (M4.2) — the Next.js app is built/deployed separately, never baked
+# into the Python backend image.
+web/
+
+# Docker files themselves
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+README.md
+architecture.md
+AI_USAGE.md
+*.md
+
+# IDE / OS cruft
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

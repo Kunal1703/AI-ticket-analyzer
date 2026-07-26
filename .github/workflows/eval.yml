@@ -1,0 +1,48 @@
+name: Eval (analysis quality gate)
+
+# Prompt/model quality gate (M5.1). Runs the golden-set eval through the *real*
+# provider and fails if accuracy is below threshold. Because it makes live LLM
+# calls (cost), it is **manual/opt-in** (workflow_dispatch), not per-PR, and is
+# skipped unless an OPENAI_API_KEY secret is configured. Use it to gate a prompt
+# or model change: dispatch it on the branch before merging.
+
+on:
+  workflow_dispatch:
+    inputs:
+      min_category_accuracy:
+        description: "Minimum category accuracy (0-1)"
+        default: "0.80"
+      min_priority_accuracy:
+        description: "Minimum priority accuracy (0-1)"
+        default: "0.60"
+
+permissions:
+  contents: read
+
+jobs:
+  eval:
+    name: Golden-set eval
+    runs-on: ubuntu-latest
+    # No-op when no key is configured, so forks/PRs never fail on a missing secret.
+    if: ${{ secrets.OPENAI_API_KEY != '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run golden-set eval
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          EVAL_MIN_CATEGORY_ACCURACY: ${{ inputs.min_category_accuracy }}
+          EVAL_MIN_PRIORITY_ACCURACY: ${{ inputs.min_priority_accuracy }}
+        run: python -m app.eval

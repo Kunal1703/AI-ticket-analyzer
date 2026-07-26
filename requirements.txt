@@ -1,0 +1,35 @@
+# Core
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.1
+
+# OpenAI
+openai==1.59.5
+tenacity==9.0.0
+
+# Database
+sqlalchemy[asyncio]==2.0.36
+alembic==1.14.0
+psycopg[binary]==3.2.3
+
+# Cache
+redis==5.2.1
+
+# Observability
+prometheus-client==0.21.1
+
+# Auth
+argon2-cffi==23.1.0
+PyJWT==2.10.1
+email-validator==2.2.0
+
+# Billing (Stripe). Only required when Stripe webhooks are configured
+# (STRIPE_WEBHOOK_SECRET); imported lazily so the app runs without it.
+stripe==11.4.1
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.25.0
+anyio==4.8.0
+httpx==0.28.1
